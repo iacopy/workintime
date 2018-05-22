@@ -1,3 +1,4 @@
+# coding: utf-8
 """
 Print working days/hours until current date.
 

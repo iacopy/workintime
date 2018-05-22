@@ -47,9 +47,10 @@ def working_days_until(year, month, end_day):
     month_start, month_end = calendar.monthrange(year, month)
     # momth_start should be always 1, obviously
     assert month_start == 1, 'Unexpexted month start day: {}'.format(month_start)
+    _, month_end = calendar.monthrange(year, month)
     business_days = pd.date_range(
-        '{yyyy}-{mm:02d}-{start}'.format(yyyy=year, mm=month, start=month_start),
-        '{yyyy}-{mm:02d}-{end}'.format(yyyy=year, mm=month, end=end_day),
+        '{yyyy}-{mm:02d}-01'.format(yyyy=year, mm=month),
+        '{yyyy}-{mm:02d}-{end:02d}'.format(yyyy=year, mm=month, end=month_end),
         freq=BDay()
     )
 
@@ -64,9 +65,14 @@ def working_days_until(year, month, end_day):
 def main():
     working_days = working_days_until(*datetime.today().timetuple()[:3])
     for i, wd in enumerate(working_days, 1):
-        print('{d}\t{i}\t{h}'.format(d=wd, i=i, h=i * HOURS_PER_DAY))
+        is_today = wd.isoformat()[:10] == datetime.today().isoformat()[:10]
+        row = '{d}\t{i}\t{h}'.format(d=wd.isoformat()[:10], i=i, h=i * HOURS_PER_DAY)
+        if is_today:
+            row += ' <'
+        print(row)
     ret = len(working_days)
-    print('{}\t{}'.format(ret, ret * HOURS_PER_DAY))
+    print('---------------------------')
+    print('MONTH TOTAL:\t{}\t{}'.format(ret, ret * HOURS_PER_DAY))
 
 
 if __name__ == '__main__':

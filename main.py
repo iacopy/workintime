@@ -6,12 +6,13 @@ USAGE:
 
 $ python main.py
 """
+from datetime import date
 from datetime import datetime
+from datetime import timedelta
 import calendar
 
 from pandas.tseries.offsets import BDay
 import pandas as pd
-
 
 
 # 1 January New Year's Day	Capodanno
@@ -41,12 +42,31 @@ FESTIVITA_NAZIONALI_ITALIANE = [
 
 HOURS_PER_DAY = 6
 
+
+def calc_easter(year):
+    """
+    Returns Easter as a tuple (year, month, day)
+    """
+    a = year % 19
+    b = year // 100
+    c = year % 100
+    d = (19 * a + b - b // 4 - ((b - (b + 8) // 25 + 1) // 3) + 15) % 30
+    e = (32 + 2 * (b % 4) + 2 * (c // 4) - d - (c % 4)) % 7
+    f = d + e - 7 * ((a + 11 * d + 22 * e) // 451) + 114
+    month = f // 31
+    day = f % 31 + 1
+    return date(year, month, day)
+
+
 def working_days_until(year, month, end_day):
     working_days = []
 
-    month_start, month_end = calendar.monthrange(year, month)
-    # momth_start should be always 1, obviously
-    assert month_start == 1, 'Unexpexted month start day: {}'.format(month_start)
+    easter = calc_easter(year)
+    easter_monday = easter + timedelta(1)
+    festivi = FESTIVITA_NAZIONALI_ITALIANE + \
+        ['{:02d}-{:02d}'.format(x.month, x.day) for x in (easter, easter_monday)]
+    festivi.sort()
+
     _, month_end = calendar.monthrange(year, month)
     business_days = pd.date_range(
         '{yyyy}-{mm:02d}-01'.format(yyyy=year, mm=month),
@@ -55,7 +75,7 @@ def working_days_until(year, month, end_day):
     )
 
     for bday in business_days:
-        if bday.isoformat()[5:10] in FESTIVITA_NAZIONALI_ITALIANE:
+        if bday.isoformat()[5:10] in festivi:
             continue
         working_days.append(bday)
 

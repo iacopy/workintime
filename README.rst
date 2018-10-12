@@ -5,10 +5,11 @@ Ti dice quanti giorni (e ore) di lavoro avresti dovuto fare sulla carta dall'ini
 
 Esempio output. Supponiamo sia il 12 ottobre 2018 e si lavori 6 ore al giorno:
 
-``$ python main.py``
-
 ::
 
+    $ python main.py 6
+    Hours per day: 6
+    ---------------------------
     2018-10-01	1	6
     2018-10-02	2	12
     2018-10-03	3	18
@@ -34,4 +35,3 @@ Esempio output. Supponiamo sia il 12 ottobre 2018 e si lavori 6 ore al giorno:
     2018-10-31	23	138
     ---------------------------
     MONTH TOTAL:	23	138
-

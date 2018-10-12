@@ -1,16 +1,16 @@
 # coding: utf-8
 """
-Print working days/hours until current date.
-
+Stampa le ore di lavoro accumulate fino al giorno corrente, ammettendo di aver lavorato esattamente 8 ore al giorno. Tiene conto delle festività italiane.
 
 USAGE:
 
-$ python main.py
+$ python main.py [h]
 """
 from datetime import date
 from datetime import datetime
 from datetime import timedelta
 import calendar
+import sys
 
 from pandas.tseries.offsets import BDay
 import pandas as pd
@@ -40,8 +40,6 @@ FESTIVITA_NAZIONALI_ITALIANE = [
     '12-25',  # Christmas
     '12-26',  # St. Stephen's Day
 ]
-
-HOURS_PER_DAY = 6
 
 
 def calc_easter(year):
@@ -83,18 +81,29 @@ def working_days_until(year, month, end_day):
     return working_days
 
 
-def main():
+def main(hours_per_day):
+    print('Hours per day:', hours_per_day)
+    print('---------------------------')
     working_days = working_days_until(*datetime.today().timetuple()[:3])
     for i, wd in enumerate(working_days, 1):
         is_today = wd.isoformat()[:10] == datetime.today().isoformat()[:10]
-        row = '{d}\t{i}\t{h}'.format(d=wd.isoformat()[:10], i=i, h=i * HOURS_PER_DAY)
+        row = '{d}\t{i}\t{h}'.format(d=wd.isoformat()[:10], i=i, h=i * hours_per_day)
         if is_today:
             row += ' <'
         print(row)
     ret = len(working_days)
     print('---------------------------')
-    print('MONTH TOTAL:\t{}\t{}'.format(ret, ret * HOURS_PER_DAY))
+    print('MONTH TOTAL:\t{}\t{}'.format(ret, ret * hours_per_day))
 
 
 if __name__ == '__main__':
-    main()
+    args = sys.argv[1:]
+    if not args:
+        hours_per_day = 8
+    elif len(args) == 1:
+        hours_per_day = int(args[0])
+    else:
+        print('Error: too many arguments. Expected 0 or 1 (hours per day).')
+        sys.exit(2)
+
+    main(hours_per_day)
